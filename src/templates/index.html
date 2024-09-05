@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel = "stylesheet" href = "{{ url_for('static', filename='style.css')}}"> 
+    <title>Code Explanation Tool</title>
+</head>
+<body>
+    <h1>Code Explanation Tool</h1>
+    <form method="POST">
+        <textarea name="code" rows="10" cols="30" placeholder="Enter your Python code here..."></textarea>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="explanation"></div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch('/', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            document.getElementById('explanation').innerText = result.explanation;
+        });
+    </script>
+</body>
+</html>
