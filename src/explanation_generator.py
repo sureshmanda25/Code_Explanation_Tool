@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import List, Dict, Any
 
 TEMPLATES = {
     'function': "This code defines a function named '{name}' that takes {arg_count} argument(s): {args}.",
@@ -10,32 +10,49 @@ TEMPLATES = {
     'if_statement': "This code starts an if statement for conditional execution."
 }
 
-def generate_explanation(analysis: Dict[str, Any]) -> str:
+def generate_explanation(analysis: List[Dict[str, Any]], indent: int = 0) -> str:
     explanations = []
+    indent_str = "  " * indent
 
-    for func in analysis['functions']:
-        explanations.append(TEMPLATES['function'].format(
-            name=func['name'],
-            arg_count=len(func['args']),
-            args=', '.join(func['args'])
-        ))
+    for item in analysis:
+        if item['type'] == 'function':
+            explanation = TEMPLATES['function'].format(
+                name=item['name'],
+                arg_count=len(item['args']),
+                args=', '.join(item['args'])
+            )
+            explanations.append(f"{indent_str}{explanation}")
+            if item['body']:
+                explanations.append(f"{indent_str}Inside this function:")
+                explanations.append(generate_explanation(item['body'], indent + 1))
 
-    for cls in analysis['classes']:
-        explanations.append(TEMPLATES['class'].format(name=cls['name']))
+        elif item['type'] == 'class':
+            explanation = TEMPLATES['class'].format(name=item['name'])
+            explanations.append(f"{indent_str}{explanation}")
+            if item['body']:
+                explanations.append(f"{indent_str}Inside this class:")
+                explanations.append(generate_explanation(item['body'], indent + 1))
 
-    for imp in analysis['imports']:
-        explanations.append(TEMPLATES['import'].format(name=imp['name']))
+        elif item['type'] == 'import':
+            explanation = TEMPLATES['import'].format(name=item['name'])
+            explanations.append(f"{indent_str}{explanation}")
 
-    for var in analysis['variables']:
-        explanations.append(TEMPLATES['variable'].format(name=var['name']))
+        elif item['type'] == 'variable':
+            explanation = TEMPLATES['variable'].format(name=item['name'])
+            explanations.append(f"{indent_str}{explanation}")
 
-    for loop in analysis['loops']:
-        if loop['type'] == 'for':
-            explanations.append(TEMPLATES['for_loop'])
-        elif loop['type'] == 'while':
-            explanations.append(TEMPLATES['while_loop'])
+        elif item['type'] in ['for_loop', 'while_loop']:
+            explanation = TEMPLATES[item['type']]
+            explanations.append(f"{indent_str}{explanation}")
+            if item['body']:
+                explanations.append(f"{indent_str}Inside this loop:")
+                explanations.append(generate_explanation(item['body'], indent + 1))
 
-    for cond in analysis['conditionals']:
-        explanations.append(TEMPLATES['if_statement'])
+        elif item['type'] == 'if_statement':
+            explanation = TEMPLATES['if_statement']
+            explanations.append(f"{indent_str}{explanation}")
+            if item['body']:
+                explanations.append(f"{indent_str}Inside this if statement:")
+                explanations.append(generate_explanation(item['body'], indent + 1))
 
     return '\n'.join(explanations)
