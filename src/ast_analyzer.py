@@ -99,7 +99,7 @@ from typing import Dict, Any, List
 class ASTAnalyzer(ast.NodeVisitor):
     def __init__(self):
         self.analysis = []
-        self.current_scope = self.analysis
+        self.current_scope = self.analysis 
 
     def visit_FunctionDef(self, node):
         func_info = {
