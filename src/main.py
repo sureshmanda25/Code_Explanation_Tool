@@ -15,17 +15,12 @@ def explain_code(code: str) -> str:
         raw_explanation = generate_explanation(analysis)
         processed_explanation = process_text(raw_explanation)
         
-        # Enhance explanation with ML model prediction
-        # ml_explanation = model.predict([code])[0]
-        # enhanced_explanation = f"{processed_explanation}\n\nAdditional insights: {ml_explanation}"
-        
-        # return enhanced_explanation
+
         return processed_explanation
     except ValueError as e:
         return f"Error: {str(e)}"
 
-# def save_feedback(code: str, explanation: str, rating: int, comment: str):
-#     feedback_handler.save_feedback(code, explanation, rating, comment)
+
 
 if __name__ == "__main__":
     # Example usage with nested structures
